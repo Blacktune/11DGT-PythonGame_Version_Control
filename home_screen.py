@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 import random
 from lvl1_screen import (lvl1_screen)
+from tutorial_screen import (tutorial_screen)
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -68,6 +69,7 @@ tb_y = 0
 sb_x = (screen_width - screen_height) / 1 - 73
 sb_y = 300
 
+
 # Create a screen that our game will be running on
 run = True
 while run:
@@ -87,7 +89,10 @@ while run:
     #go to lvl1 page
     if keys[K_p]:
         lvl1_screen()  # switch to the new screen
-        run = False  # end the current screen
+        run = False# end the current screen
+    if keys[K_t]:
+        tutorial_screen()
+        tun = False
 
     pygame.display.update()
 pygame.quit()
