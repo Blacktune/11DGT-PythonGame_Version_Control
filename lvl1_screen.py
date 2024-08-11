@@ -20,6 +20,10 @@ def lvl1_screen():
     ms_height = 100
     ms_width = 100
 
+    #set shop menu height
+    sm_height = 500
+    sm_width = 300
+
 
     screen = pygame.display.set_mode((screen_width, screen_height))
     pygame.display.set_caption("The Fishing Mystery")
@@ -46,6 +50,11 @@ def lvl1_screen():
     ms = pygame.image.load('img/shop.png')
     ms = pygame.transform.scale(ms,(ms_width, ms_height))
 
+    # create our shop menu
+    sm = pygame.image.load('img/download.png')
+    sm = pygame.transform.scale(sm, (sm_width,sm_height))
+
+
     # Set initial character position
     ch_x = screen_width // 2 - ch_width // 2
     ch_y = screen_height // 2 - ch_height // 2 + 135
@@ -61,8 +70,13 @@ def lvl1_screen():
     ms_x = screen_width // 2 - ms_width // 2 + 200
     ms_y = screen_height // 2 - ms_height // 2 + 150
 
+    #define where the shop menue will be
+    sm_x = screen_width // 2 - sm_width // 2
+    sm_y = screen_height // 2 - sm_height // 2
+
     # Create a screen that our game will be running on
     run = True
+    shop = False
     while run:
         clock.tick(fps)
         screen.blit(bg, (0, 0))
@@ -72,6 +86,7 @@ def lvl1_screen():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+
 
         # Get key states
         keys = pygame.key.get_pressed()
@@ -108,7 +123,20 @@ def lvl1_screen():
                                                             merchant_rect.collidepoint(ch_x, new_y + ch_height)):
                 ch_y = new_y
 
+                # Shop logic
+        if keys[K_s]:
+            shop = True
+        if keys[K_q] and shop:
+            shop = False
+
+        if shop:
+            screen.blit(sm, (sm_x, sm_y))  # Adjust sm_x and sm_y for correct positioning
+
         pygame.display.update()
+
+
+
+    pygame.display.update()
 
     pygame.quit()
 pass
