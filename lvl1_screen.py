@@ -7,6 +7,10 @@ def lvl1_screen():
 
     clock = pygame.time.Clock()
     fps = 60
+    # Define the font for the game
+
+    font = pygame.font.SysFont('Baus 93', 60)
+
 
     # Set screen width and height
     screen_width = 936
@@ -24,6 +28,10 @@ def lvl1_screen():
     sm_height = 500
     sm_width = 300
 
+    #set coin size
+    coin_height = 40
+    coin_width = 40
+
 
     screen = pygame.display.set_mode((screen_width, screen_height))
     pygame.display.set_caption("The Fishing Mystery")
@@ -35,8 +43,6 @@ def lvl1_screen():
     pygame.mixer.music.load('sound.mp3/lvl1_song.mp3')
     pygame.mixer.music.play(-1)
 
-    # Define the font for the game
-    font = pygame.font.SysFont('Baus 93', 60)
 
     # Create our background image for our game
     bg = pygame.image.load('img/th.png')
@@ -46,6 +52,11 @@ def lvl1_screen():
     ch = pygame.image.load('img/Fishing_Character-removebg-preview.png')
     ch = pygame.transform.scale(ch, (ch_width, ch_height))
 
+    # create our coin image
+    # Create our playable character
+    coin = pygame.image.load('img/coin.png')
+    coin = pygame.transform.scale(coin, (coin_width, coin_height))
+
     # create our Merchant
     ms = pygame.image.load('img/shop.png')
     ms = pygame.transform.scale(ms,(ms_width, ms_height))
@@ -53,6 +64,11 @@ def lvl1_screen():
     # create our shop menu
     sm = pygame.image.load('img/download.png')
     sm = pygame.transform.scale(sm, (sm_width,sm_height))
+
+    # lets make our money system this will work with our shop and will help us create a market for our game
+    money = 0
+    money_text = font.render(f"{money}", True, (255, 255, 255))
+
 
 
     # Set initial character position
@@ -74,6 +90,7 @@ def lvl1_screen():
     sm_x = screen_width // 2 - sm_width // 2
     sm_y = screen_height // 2 - sm_height // 2
 
+
     # Create a screen that our game will be running on
     run = True
     shop = False
@@ -82,6 +99,9 @@ def lvl1_screen():
         screen.blit(bg, (0, 0))
         screen.blit(ch, (ch_x, ch_y))
         screen.blit(ms, (ms_x, ms_y))
+        # Display the score text on the screen
+        screen.blit(money_text, (50, 10))  # Position the text at (10, 10) coordinates
+        screen.blit(coin, (10,8))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
