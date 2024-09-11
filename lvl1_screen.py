@@ -1,6 +1,8 @@
 import pygame
 from pygame.locals import *
 import random
+from pygame import *
+
 
 def lvl1_screen():
     pygame.init()
@@ -10,6 +12,25 @@ def lvl1_screen():
     # Define the font for the game
 
     font = pygame.font.SysFont('Baus 93', 60)
+    # money_text = font.render(f"{money}", True, (255, 255, 255))
+    global money
+    money = 0
+    global money_text
+    money_text = font.render(f"{money}", True, (255, 255, 255))
+    global exp
+    exp = 0
+    global exp_text
+    exp_text = font.render(f"{exp}", True, (255, 255, 255))
+    global leveling
+    leveling = 0
+    global leveling_text
+    leveling_text = font.render(f"{leveling}", True, (255, 255, 255))
+    global game_over_text
+    game_over_text = font.render(f"You Lost! Your money went into a negative!", True, (255, 255, 255))
+    global fish_cooldown
+    fish_cooldown = 0
+
+
 
 
     # Set screen width and height
@@ -33,7 +54,16 @@ def lvl1_screen():
     coin_width = 40
 
 
+
+
     screen = pygame.display.set_mode((screen_width, screen_height))
+
+    # Drawing text function
+    def drawing_text(text, font_, text_col, x, y):
+        global font
+        img = font.render(text, True, text_col)
+        screen.blit(img, (x, y))
+
     pygame.display.set_caption("The Fishing Mystery")
 
     pygame.mixer.init()  # initialize the mixer
@@ -65,10 +95,6 @@ def lvl1_screen():
     sm = pygame.image.load('img/download.png')
     sm = pygame.transform.scale(sm, (sm_width,sm_height))
 
-    # lets make our money system this will work with our shop and will help us create a market for our game
-    money = 0
-    money_text = font.render(f"{money}", True, (255, 255, 255))
-
 
 
     # Set initial character position
@@ -90,18 +116,24 @@ def lvl1_screen():
     sm_x = screen_width // 2 - sm_width // 2
     sm_y = screen_height // 2 - sm_height // 2
 
-
     # Create a screen that our game will be running on
     run = True
     shop = False
+
+
+    fish_cooldown = 0
+    fished_last_frame = False
     while run:
         clock.tick(fps)
         screen.blit(bg, (0, 0))
         screen.blit(ch, (ch_x, ch_y))
         screen.blit(ms, (ms_x, ms_y))
         # Display the score text on the screen
-        screen.blit(money_text, (50, 10))  # Position the text at (10, 10) coordinates
         screen.blit(coin, (10,8))
+
+        # Define fish data
+        fish_types = ["Salmon", "Tuna", "Cod", "Trout"]
+        lvl2_fish_types = ["Salmon", "Tuna", "Cod", "Trout", "Shark", "Bass", "Snapper", "Whale"]
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -152,9 +184,68 @@ def lvl1_screen():
         if shop:
             screen.blit(sm, (sm_x, sm_y))  # Adjust sm_x and sm_y for correct positioning
 
+        if keys[K_f]:
+            if not fished_last_frame:
+                fished_last_frame = True
+
+                fish_type = random.choice(lvl2_fish_types)
+
+                if fish_type == "Cod":
+                    money += 2
+                    exp += 2
+                    print(f"You caught a Cod! Your money increced by +5! Your current Money is: {(money)} Your Exp increaced! Your currrent exp is {(exp)}! Your current Lvl is {(leveling)}")
+                elif fish_type == "Tuna":
+                    money += 5
+                    exp += 2
+                    print(f"You caught a Tuna! Your money increced by +10! Your current Money is: {(money)}! Your Exp increaced! Your currrent exp is {(exp)}! Your current Lvl is {(leveling)}")
+                elif fish_type == "Salmon":
+                    money += 3
+                    exp += 1
+                    print(f"You caught a Salmon! Your money increced by +7! Your current Money is: {(money)} Your Exp increaced! Your currrent exp is {(exp)}! Your current Lvl is {(leveling)}")
+                elif fish_type == "Trout":
+                    money += 1
+                    exp += 4
+                    print(f"You caught a Trout! Your money increced by +1! Your current Money is: {(money)} Your Exp increaced! Your currrent exp is {(exp)}! Your current Lvl is {(leveling)}")
+
+                elif fish_type == "Shark":
+                    money -= 10
+                    exp -= 10
+                    print(f"You caught a Shark! Your money deacreased by -10! Your current Money is: {(money)} Your Exp decreaced! Your currrent exp is {(exp)}! Your current Lvl is {(leveling)}")
+                elif fish_type == "Bass":
+                    money += 10
+                    exp += 5
+                    print(f"You caught a Bass! Your money increced by +10! Your current Money is: {(money)} Your Exp increaced! Your currrent exp is {(exp)}! Your current Lvl is {(leveling)}")
+                elif fish_type == "Snapper":
+                    money += 7
+                    exp += 2
+                    print(f"You caught a Snapper! Your money increced by +7! Your current Money is: {(money)} Your Exp increaced! Your currrent exp is {(exp)}! Your current Lvl is {(leveling)}")
+                elif fish_type == "Whale":
+                    money += 1
+                    exp += 50
+                    print(f"You caught a Trout! Your money decreaced by -50! Your current Money is: {(money)} Your Exp decraced! Your currrent exp is {(exp)}! Your current Lvl is {(leveling)}")
+                else:
+                    money += 0
+                if exp >= 100:
+                    exp = 0
+                    leveling += 1
+
+                money_text = font.render(f"{money}", True, (255, 255, 255))
+                exp_text = font.render(f"EXP:{exp}", True, (255, 255, 255))
+                leveling_text = font.render(f"LVL:{leveling}", True, (255, 255, 255))
+                game_over_text = font.render(f"You Lost! Your money went into a negative!", True,  (255, 255, 255))
+        else:
+            fished_last_frame = False
+
+
+
+
+        screen.blit(money_text, (50, 10))  # Position the text at (10, 10) coordinates
+        screen.blit(exp_text, (500, 10))  # Position the text at (10, 10) coordinates
+        screen.blit(leveling_text, (700, 10))  # Position the text at (10, 10) coordinates
+
+
+
         pygame.display.update()
-
-
 
     pygame.display.update()
 
