@@ -12,9 +12,9 @@ def lvl1_screen():
     # Define the font for the game
 
     font = pygame.font.SysFont('Baus 93', 60)
-    # money_text = font.render(f"{money}", True, (255, 255, 255))
+
     global money
-    money = 0
+    money = 16000
     global money_text
     money_text = font.render(f"{money}", True, (255, 255, 255))
     global exp
@@ -27,8 +27,15 @@ def lvl1_screen():
     leveling_text = font.render(f"{leveling}", True, (255, 255, 255))
     global game_over_text
     game_over_text = font.render(f"You Lost! Your money went into a negative!", True, (255, 255, 255))
-    global fish_cooldown
-    fish_cooldown = 0
+    global fish_probabilities
+    fish_probabilities = [1000, 1000, 1000, 1000, 500, 500, 500, 20, 50, 500, 500, 1]
+    global upgrade_1_text
+    upgrade_1_text = font.render("Upgrade 1 (Cost: 1000)", True, (255, 255, 255))
+    global upgrade_2_text
+    upgrade_2_text = font.render("Upgrade 2 (Cost: 5000)", True, (255, 255, 255))
+    global upgrade_3_text
+    upgrade_3_text = font.render("Upgrade 3 (Cost: 10000)", True, (255, 255, 255))
+
 
 
 
@@ -53,16 +60,7 @@ def lvl1_screen():
     coin_height = 40
     coin_width = 40
 
-
-
-
     screen = pygame.display.set_mode((screen_width, screen_height))
-
-    # Drawing text function
-    def drawing_text(text, font_, text_col, x, y):
-        global font
-        img = font.render(text, True, text_col)
-        screen.blit(img, (x, y))
 
     pygame.display.set_caption("The Fishing Mystery")
 
@@ -73,6 +71,8 @@ def lvl1_screen():
     pygame.mixer.music.load('sound.mp3/lvl1_song.mp3')
     pygame.mixer.music.play(-1)
 
+    # Set initial volume to 1.0 (full volume)
+    pygame.mixer.music.set_volume(1.0)
 
     # Create our background image for our game
     bg = pygame.image.load('img/th.png')
@@ -83,7 +83,6 @@ def lvl1_screen():
     ch = pygame.transform.scale(ch, (ch_width, ch_height))
 
     # create our coin image
-    # Create our playable character
     coin = pygame.image.load('img/coin.png')
     coin = pygame.transform.scale(coin, (coin_width, coin_height))
 
@@ -119,6 +118,9 @@ def lvl1_screen():
     # Create a screen that our game will be running on
     run = True
     shop = False
+    upgrade_1 = True
+    upgrade_2 = True
+    upgrade_3 = True
 
 
     fish_cooldown = 0
@@ -128,13 +130,12 @@ def lvl1_screen():
         screen.blit(bg, (0, 0))
         screen.blit(ch, (ch_x, ch_y))
         screen.blit(ms, (ms_x, ms_y))
-        # Display the score text on the screen
         screen.blit(coin, (10,8))
 
-        # Define fish data
-        fish_types = ["Salmon", "Tuna", "Cod", "Trout"]
-        lvl2_fish_types = ["Salmon", "Tuna", "Cod", "Trout", "Shark", "Bass", "Snapper", "Whale"]
 
+        # Define fish data
+        lvl2_fish_types = ["Salmon", "Tuna", "Cod", "Trout", "Shark", "Bass", "Snapper", "Whale", "Marlin", "Ray", "Pike", "Goldfish"]
+        fish_probabilities = [1000,   1000,   1000,  1000,    500,     500,      500,      20,       50,     500,    500,       1]
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -142,6 +143,16 @@ def lvl1_screen():
 
         # Get key states
         keys = pygame.key.get_pressed()
+
+        # Get current volume
+        current_volume = pygame.mixer.music.get_volume()
+        # Check for volume adjustment keys
+        if keys[K_i]:  # Press 'I' to decrease the volume
+            new_volume = max(0.0, current_volume - 0.1)  # Ensure volume doesn't go below 0.0
+            pygame.mixer.music.set_volume(new_volume)
+        if keys[K_o]:  # Press 'O' to increase the volume
+            new_volume = min(1.0, current_volume + 0.1)  # Ensure volume doesn't go above 1.0
+            pygame.mixer.music.set_volume(new_volume)
 
         # Move left
         if keys[K_LEFT]:
@@ -181,6 +192,39 @@ def lvl1_screen():
         if keys[K_q] and shop:
             shop = False
 
+
+         #Start the shop items an the way they work check if they have enough money for the function to run and check if the upgrade has already been bought
+        if keys[K_1] and money >= 1000 and upgrade_1:
+            print(f"You just bough your First upgrade! It cost 1000, your current money is: {money}")
+            money -= 1000
+            upgrade_1 = False
+            money_text = font.render(f"{money}", True, (255, 255, 255))
+
+        if upgrade_1:
+            screen.blit(upgrade_1_text, (10, 50))
+
+        if keys[K_2] and money >= 5000 and upgrade_2:
+            print(f"You just bough your First upgrade! It cost 1000, your current money is: {money}")
+            money -= 5000
+            upgrade_2 = False
+            money_text = font.render(f"{money}", True, (230, 255, 255))
+
+        if upgrade_2:
+            screen.blit(upgrade_2_text, (10, 100))
+
+        if keys[K_3] and money >= 10000 and upgrade_3:
+            print(f"You just bough your First upgrade! It cost 1000, your current money is: {money}")
+            money -= 10000
+            upgrade_3 = False
+            money_text = font.render(f"{money}", True, (200, 255, 255))
+
+        if upgrade_3:
+            screen.blit(upgrade_3_text, (10, 150))
+
+        if shop:
+            screen.blit(sm, (sm_x, sm_y))  # Adjust sm_x and sm_y for correct positioning
+
+
         if shop:
             screen.blit(sm, (sm_x, sm_y))  # Adjust sm_x and sm_y for correct positioning
 
@@ -188,12 +232,15 @@ def lvl1_screen():
             if not fished_last_frame:
                 fished_last_frame = True
 
-                fish_type = random.choice(lvl2_fish_types)
+                fish_type = random.choices(lvl2_fish_types, weights = fish_probabilities, k = 1)[0]
+                money -= 1
 
                 if fish_type == "Cod":
                     money += 2
                     exp += 2
                     print(f"You caught a Cod! Your money increced by +5! Your current Money is: {(money)} Your Exp increaced! Your currrent exp is {(exp)}! Your current Lvl is {(leveling)}")
+
+
                 elif fish_type == "Tuna":
                     money += 5
                     exp += 2
@@ -212,7 +259,7 @@ def lvl1_screen():
                     exp -= 10
                     print(f"You caught a Shark! Your money deacreased by -10! Your current Money is: {(money)} Your Exp decreaced! Your currrent exp is {(exp)}! Your current Lvl is {(leveling)}")
                 elif fish_type == "Bass":
-                    money += 10
+                    money += 7
                     exp += 5
                     print(f"You caught a Bass! Your money increced by +10! Your current Money is: {(money)} Your Exp increaced! Your currrent exp is {(exp)}! Your current Lvl is {(leveling)}")
                 elif fish_type == "Snapper":
@@ -220,30 +267,46 @@ def lvl1_screen():
                     exp += 2
                     print(f"You caught a Snapper! Your money increced by +7! Your current Money is: {(money)} Your Exp increaced! Your currrent exp is {(exp)}! Your current Lvl is {(leveling)}")
                 elif fish_type == "Whale":
-                    money += 1
+                    money += 50
                     exp += 50
                     print(f"You caught a Trout! Your money decreaced by -50! Your current Money is: {(money)} Your Exp decraced! Your currrent exp is {(exp)}! Your current Lvl is {(leveling)}")
+                elif fish_type == "Marlin":
+                    money += 20
+                    exp += 10
+                    print(
+                        f"You caught a Trout! Your money Increaced by 20! Your current Money is: {(money)} Your Exp increaced! Your currrent exp is {(exp)}! Your current Lvl is {(leveling)}")
+                elif fish_type == "Ray":
+                    money += 5
+                    exp += 4
+                    print(
+                        f"You caught a Trout! Your money increaced by 5! Your current Money is: {(money)} Your Exp Increaced! Your currrent exp is {(exp)}! Your current Lvl is {(leveling)}")
+                elif fish_type == "Pike":
+                    money += 9
+                    exp += 3
+                    print(
+                        f"You caught a Trout! Your money increaced by 30! Your current Money is: {(money)} Your Exp Increaced! Your currrent exp is {(exp)}! Your current Lvl is {(leveling)}")
+                elif fish_type == "Goldfish":
+                    money += 10000
+                    exp += 100
+                    print(
+                        f"You caught a Goldfish! Your money Increaced by by 10,000! Your current Money is: {(money)} Your Exp Increaced! Your currrent exp is {(exp)}! Your current Lvl is {(leveling)}")
+
                 else:
                     money += 0
-                if exp >= 100:
+                if exp >= 300:
                     exp = 0
                     leveling += 1
 
                 money_text = font.render(f"{money}", True, (255, 255, 255))
                 exp_text = font.render(f"EXP:{exp}", True, (255, 255, 255))
                 leveling_text = font.render(f"LVL:{leveling}", True, (255, 255, 255))
-                game_over_text = font.render(f"You Lost! Your money went into a negative!", True,  (255, 255, 255))
+
         else:
             fished_last_frame = False
 
-
-
-
         screen.blit(money_text, (50, 10))  # Position the text at (10, 10) coordinates
         screen.blit(exp_text, (500, 10))  # Position the text at (10, 10) coordinates
-        screen.blit(leveling_text, (700, 10))  # Position the text at (10, 10) coordinates
-
-
+        screen.blit(leveling_text, (700, 10))  # Position the text at (10, 10) coordinate
 
         pygame.display.update()
 
